@@ -67,11 +67,12 @@ namespace FinalyBookstore
 
         public void ShowAllBooks()
         {
-            var books = contex.Books.ToList();
+            //var books = contex.Books.ToList();
+            var books = contex.Books.Include(b => b.Author).Include(b => b.Genre).ToList();
 
             foreach (var book in books)
             {
-                Console.WriteLine($"Book name :{book.Name}  Book author :{book.Author}  Book genre :{book.Genre}  Book Year :{book.Year}");
+                Console.WriteLine($" {book.Name} {book.Author.Name} {book.Genre.Name} {book.Year}");
             }
         }
         public void ShowAllAuthors()
@@ -80,7 +81,7 @@ namespace FinalyBookstore
 
             foreach (var author in authors)
             {
-                Console.WriteLine($"{author.Name} {author.SurName} {author.LastName}");
+                Console.WriteLine($"{author.Id}{author.Name} {author.SurName} {author.LastName}");
             }
         }
         public void ShowAllGenres()
@@ -89,9 +90,20 @@ namespace FinalyBookstore
 
             foreach (var genre in genres)
             {
-                Console.WriteLine(genre.Name);
+                Console.WriteLine($"{genre.Id}\t{genre.Name}");
             }
         }
+        public void ShowAllPublisher()
+        {
+            var publisher = contex.Publishers.ToList();
+
+            foreach (var publishers in publisher)
+            {
+                Console.WriteLine($"{publishers.Id} {publishers.Name}");
+            }
+        }
+
+
 
         public void DeleteBookByName(string bookName)
         {
@@ -101,11 +113,11 @@ namespace FinalyBookstore
             {
                 contex.Books.Remove(bookToDelete);
                 contex.SaveChanges();
-                Console.WriteLine($"Книгу \"{bookName}\" видалено з бази даних.");
+                Console.WriteLine($"Book \"{bookName}\" delete in database.");
             }
             else
             {
-                Console.WriteLine($"Книгу з назвою \"{bookName}\" не знайдено.");
+                Console.WriteLine($"The book \"{bookName}\" not found.");
             }
         }
 
@@ -127,8 +139,45 @@ namespace FinalyBookstore
             contex.Books.Add(newBook);
             contex.SaveChanges();
 
-            Console.WriteLine("Нову книгу успішно додано до бази даних.");
+            Console.WriteLine("New book successfully added");
         }
+
+        public void AddNewAuthor(string name, string surName,string lastName)
+        {
+            var newAuthor = new Author
+            {
+                Name = name,
+                SurName = surName,
+                LastName = lastName
+            };
+            contex.Authors.Add(newAuthor);
+            contex.SaveChanges();
+            Console.WriteLine("new author successfully added");
+        }
+
+        public void AddNewPublisher(string name)
+        {
+            var newPublisher = new Publisher
+            {
+                Name = name,
+            };
+            contex.Publishers.Add(newPublisher);
+            contex.SaveChanges();
+            Console.WriteLine("New publishing house successfully added");
+        }
+
+        public void AddNewGenre(string name)
+        {
+            var newGenre = new Publisher
+            {
+                Name = name,
+            };
+            contex.Publishers.Add(newGenre);
+            contex.SaveChanges();
+            Console.WriteLine("New genre house successfully added");
+        }
+
+
     }
 
 
@@ -149,221 +198,359 @@ namespace FinalyBookstore
             //const string LoginAdmin = "Admin";
             //const int PasswordAdmin = 123456;
 
-            
 
-            string key;
+            int attemptsLeft = 5;
+            string name1;
             Console.WriteLine("Who you are:");
-            key = Console.ReadLine();
-            switch (key)
+            name1 = Console.ReadLine();
+            Console.WriteLine("Enter password :");
+            int password = int.Parse(Console.ReadLine());
+
+            if (name1 == LoginUser)
             {
-                case "User":
+                while (attemptsLeft > 0)
+                {
+                    if (password == PasswordUser)
                     {
-                        int attemptsLeft = 5;
-                        while (attemptsLeft > 0)
+                        int b = new int();
+                        do
                         {
-                            Console.WriteLine("Enter password :");
-                            int password = int.Parse(Console.ReadLine());
-                            if (password == PasswordUser)
-                            {
-                                int b = new int();
-                                do
-                                {
-                                    Console.WriteLine("search books by author (Enter 1)");
-                                    Console.WriteLine("search books by name (Enter 2)");
-                                    Console.WriteLine("search books by genre (Enter 3)");
-                                    Console.WriteLine("sorting by novelty (Enter 4)");
-                                    Console.WriteLine("sorting by popularity (Enter 5)");
-                                    Console.WriteLine("Show all Books (Enter 6)");
-                                    Console.WriteLine("Show all author (Enter 7)");
-                                    Console.WriteLine("Show all genre (Enter 8)");
-                                    Console.WriteLine("0 - exit");
+                            Console.ReadKey();
+                            Console.Clear();
+                            Console.WriteLine("search books by author (Enter 1)");
+                            Console.WriteLine("search books by name (Enter 2)");
+                            Console.WriteLine("search books by genre (Enter 3)");
+                            Console.WriteLine("sorting by novelty (Enter 4)");
+                            Console.WriteLine("sorting by popularity (Enter 5)");
+                            Console.WriteLine("Show all Books (Enter 6)");
+                            Console.WriteLine("Show all author (Enter 7)");
+                            Console.WriteLine("Show all genre (Enter 8)");
+                            Console.WriteLine("Show all publishers (Enter 9)");
 
-                                    int a = int.Parse(Console.ReadLine());
-                                    switch (a)
+                            Console.WriteLine("0 - exit");
+
+                            int a = int.Parse(Console.ReadLine());
+                            switch (a)
+                            {
+                                case 0:
                                     {
-                                        case 0:
-                                            {
-                                                Environment.Exit(0);
-                                                break;
-                                            }
-                                        case 1:
-                                            {
-                                                Console.WriteLine("Enter the author's name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByAuthor(name);
-                                                break;
-                                            }
-                                        case 2:
-                                            {
-                                                Console.WriteLine("Enter book name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByName(name);
-                                                break;
-                                            }
-                                        case 3:
-                                            {
-                                                Console.WriteLine("Enter genre name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByGenre(name);
-                                                break;
-                                            }
-                                        case 4:
-                                            {
-                                                managerBooks.SortByNovelty();
-                                                break;
-                                            }
-                                        case 5:
-                                            {
-                                                managerBooks.SortByPopularity();
-                                                break;
-                                            }
-                                        case 6:
-                                            {
-                                                managerBooks.ShowAllBooks();
-                                                break;
-                                            }
-                                        case 7:
-                                            {
-                                                managerBooks.ShowAllAuthors();
-                                                break;
-                                            }
-                                        case 8:
-                                            {
-                                                managerBooks.ShowAllGenres();
-                                                break;
-                                            }
-                                        default:
-                                            Console.WriteLine("Invalid choice. Please try again.");
-                                            break;
+                                        Environment.Exit(0);
+                                        break;
                                     }
-                                } while (b != 0);
+                                case 1:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter the author's name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByAuthor(name);
+                                        
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter book name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByName(name);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter genre name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByGenre(name);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        managerBooks.SortByNovelty();
+                                        break;
+                                    }
+                                case 5:
+                                    {
+                                        managerBooks.SortByPopularity();
+                                        break;
+                                    }
+                                case 6:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Books");
+                                        managerBooks.ShowAllBooks();
+                                        break;
+                                    }
+                                case 7:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Authors");
+                                        managerBooks.ShowAllAuthors();
+                                        break;
+                                    }
+                                case 8:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Genres");
+                                        managerBooks.ShowAllGenres();
+                                        break;
+                                    }
+                                case 9:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All publishers");
+                                        managerBooks.ShowAllPublisher();
+                                        break;
+                                    }
+                                default:
+                                    Console.Clear();
+                                    Console.WriteLine("Invalid choice. Please try again.");
+                                    break;
+                            }
+                        } while (b != 0);
 
-                            }
-                            else
-                            {
-                                attemptsLeft--;
-                                Console.WriteLine($"The password is incorrect. Remaining attempts : {attemptsLeft}");
-                            }
-                        }
-                        if (attemptsLeft == 0)
-                        {
-                            Console.WriteLine("You have exhausted all attempts. The program will be closed.");
-                            Environment.Exit(0);
-                        }
-                        break;
+
                     }
-
-
-
-                case "Manager":
+                    else
                     {
-                        int attemptsLeft = 5;
-                        while (attemptsLeft > 0)
-                        {
-                            Console.WriteLine("Enter password :");
-                            int password = int.Parse(Console.ReadLine());
-                            if (password == PasswordManager)
-                            {
-                                int b = new int();
-                                do
-                                {
-                                    Console.WriteLine("search books by author (Enter 1)");
-                                    Console.WriteLine("search books by name (Enter 2)");
-                                    Console.WriteLine("search books by genre (Enter 3)");
-                                    Console.WriteLine("sorting by novelty (Enter 4)");
-                                    Console.WriteLine("sorting by popularity (Enter 5)");
-                                    Console.WriteLine("Show all Books (Enter 6)");
-                                    Console.WriteLine("Show all author (Enter 7)");
-                                    Console.WriteLine("Show all genre (Enter 8)");
-                                    Console.WriteLine("add new book (Enter 9)");
-                                    Console.WriteLine("delete book (Enter 10)");
-                                    Console.WriteLine("0 - exit");
-
-                                    int a = int.Parse(Console.ReadLine());
-                                    switch (a)
-                                    {
-                                        case 0:
-                                            {
-                                                Environment.Exit(0);
-                                                break;
-                                            }
-                                        case 1:
-                                            {
-                                                Console.WriteLine("Enter the author's name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByAuthor(name);
-                                                break;
-                                            }
-                                        case 2:
-                                            {
-                                                Console.WriteLine("Enter book name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByName(name);
-                                                break;
-                                            }
-                                        case 3:
-                                            {
-                                                Console.WriteLine("Enter genre name");
-                                                string name = Console.ReadLine();
-                                                managerBooks.SearchBooksByGenre(name);
-                                                break;
-                                            }
-                                        case 4:
-                                            {
-                                                managerBooks.SortByNovelty();
-                                                break;
-                                            }
-                                        case 5:
-                                            {
-                                                managerBooks.SortByPopularity();
-                                                break;
-                                            }
-                                        case 6:
-                                            {
-                                                managerBooks.ShowAllBooks();
-                                                break;
-                                            }
-                                        case 7:
-                                            {
-                                                managerBooks.ShowAllAuthors();
-                                                break;
-                                            }
-                                        case 8:
-                                            {
-                                                managerBooks.ShowAllGenres();
-                                                break;
-                                            }
-                                            case 9:
-                                            {
-                                                break;
-                                            }
-                                            case 10:
-                                            {
-                                                break;
-                                            }
-                                        default:
-                                            Console.WriteLine("Invalid choice. Please try again.");
-                                            break;
-                                    }
-                                } while (b != 0);
-
-
-
-                            }
-                            else
-                            {
-                                attemptsLeft--;
-                                Console.WriteLine($"The password is incorrect. Remaining attempts : {attemptsLeft}");
-                            }
-                        }
-                        if (attemptsLeft == 0)
-                        {
-                            Console.WriteLine("You have exhausted all attempts. The program will be closed.");
-                            Environment.Exit(0);
-                        }
-                        break;
+                        attemptsLeft--;
+                        Console.WriteLine($"The password is incorrect. Remaining attempts : {attemptsLeft}");
                     }
-               
+                    if (attemptsLeft == 0)
+                    {
+                        Console.WriteLine("You have exhausted all attempts. The program will be closed.");
+                        Environment.Exit(0);
+                    }
+                }
+            }
+
+            //manager
+
+            if(name1 == LoginManager)
+            {
+                while (attemptsLeft > 0)
+                {
+                    if (password == PasswordManager)
+                    {
+                        int b = new int();
+                        do
+                        {
+                            Console.ReadKey();
+                            Console.Clear();
+                            Console.WriteLine("search books by author (Enter 1)");
+                            Console.WriteLine("search books by name (Enter 2)");
+                            Console.WriteLine("search books by genre (Enter 3)");
+                            Console.WriteLine("sorting by novelty (Enter 4)");
+                            Console.WriteLine("sorting by popularity (Enter 5)");
+                            Console.WriteLine("Show all Books (Enter 6)");
+                            Console.WriteLine("Show all author (Enter 7)");
+                            Console.WriteLine("Show all genre (Enter 8)");
+                            Console.WriteLine("add new book (Enter 9)");
+                            Console.WriteLine("delete book (Enter 10)");
+                            Console.WriteLine("0 - exit");
+
+                            int a = int.Parse(Console.ReadLine());
+                            switch (a)
+                            {
+                                case 0:
+                                    {
+                                        Environment.Exit(0);
+                                        break;
+                                    }
+                                case 1:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter the author's name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByAuthor(name);
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter book name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByName(name);
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter genre name");
+                                        string name = Console.ReadLine();
+                                        managerBooks.SearchBooksByGenre(name);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        managerBooks.SortByNovelty();
+                                        break;
+                                    }
+                                case 5:
+                                    {
+                                        managerBooks.SortByPopularity();
+                                        break;
+                                    }
+                                case 6:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Books");
+                                        managerBooks.ShowAllBooks();
+                                        break;
+                                    }
+                                case 7:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Authors");
+                                        managerBooks.ShowAllAuthors();
+                                        break;
+                                    }
+                                case 8:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("All Genres");
+                                        managerBooks.ShowAllGenres();
+                                        break;
+                                    }
+                                case 9:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter name book :");
+                                        string BookName = Console.ReadLine();
+                                        Console.WriteLine("Enter count of pages : ");
+                                        int pages = int.Parse(Console.ReadLine());
+                                        Console.WriteLine("Enter year : ");
+                                        int year = int.Parse(Console.ReadLine());
+                                        Console.WriteLine("Enter cost price : ");
+                                        decimal costPrice = decimal.Parse(Console.ReadLine());
+                                        Console.WriteLine("Enter price : ");
+                                        decimal price = decimal.Parse(Console.ReadLine());
+                                        Console.Write("Is Heir? (true/false): ");
+                                        bool heir;
+                                        while (!bool.TryParse(Console.ReadLine(), out heir))
+                                        {
+                                            Console.WriteLine("Invalid input. Please enter 'true' or 'false'.");
+                                            Console.Write("Is Heir? (true/false): ");
+                                        }
+
+                                        int AuthorId = 0;
+                                        int choice1;
+                                        Console.Clear();
+                                        Console.WriteLine("1 - choose from existing authors");
+                                        Console.WriteLine("2 - create an author");
+                                        choice1 = int.Parse(Console.ReadLine());
+                                        switch (choice1)
+                                        {
+                                            case 1:
+                                                {
+                                                    managerBooks.ShowAllAuthors();
+                                                    Console.WriteLine("Enter id author");
+                                                    AuthorId = int.Parse(Console.ReadLine());
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    Console.Clear();
+                                                    Console.WriteLine("Enter author name");
+                                                    string AuthorName = Console.ReadLine();
+                                                    Console.WriteLine("Enter author SurName");
+                                                    string AuthorSurname = Console.ReadLine();
+                                                    Console.WriteLine("Enter author LastName");
+                                                    string Lastname = Console.ReadLine();
+                                                    managerBooks.AddNewAuthor(AuthorName, AuthorSurname, Lastname);
+                                                    AuthorId = managerBooks.contex.Authors.OrderByDescending(x => x.Id)
+                                                        .FirstOrDefault()?.Id ?? 0;
+                                                    break;
+                                                }
+                                        }
+
+                                        int PublisherId = 0;
+                                        int choice2;
+                                        Console.Clear();
+                                        Console.WriteLine("1 - choose an existing publishing house");
+                                        Console.WriteLine("2 - create a publishing house");
+                                        choice2 = int.Parse(Console.ReadLine());
+                                        switch (choice2)
+                                        {
+                                            case 1:
+                                                {
+                                                    managerBooks.ShowAllPublisher();
+                                                    Console.WriteLine("Enter id publishers");
+                                                    PublisherId = int.Parse(Console.ReadLine());
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    Console.Clear();
+                                                    Console.WriteLine("Enter publisher name");
+                                                    string PublisherName = Console.ReadLine();
+                                                    managerBooks.AddNewPublisher(PublisherName);
+                                                    PublisherId = managerBooks.contex.Publishers.OrderByDescending(x => x.Id)
+                                                        .FirstOrDefault()?.Id ?? 0;
+                                                    break;
+                                                }
+                                        }
+                                        int genreId = 0;
+                                        int choice3;
+                                        Console.Clear();
+                                        Console.WriteLine("1 - choose an existing genre");
+                                        Console.WriteLine("2 - create a genre");
+                                        choice3 = int.Parse(Console.ReadLine());
+                                        switch (choice3)
+                                        {
+                                            case 1:
+                                                {
+                                                    managerBooks.ShowAllGenres();
+                                                    Console.WriteLine("Enter id genre");
+                                                    genreId = int.Parse(Console.ReadLine());
+                                                    break;
+                                                }
+                                            case 2:
+                                                {
+                                                    Console.Clear();
+                                                    Console.WriteLine("Enter genre name");
+                                                    string GenreName = Console.ReadLine();
+                                                    managerBooks.AddNewGenre(GenreName);
+                                                    genreId = managerBooks.contex.Genres.OrderByDescending(x => x.Id)
+                                                        .FirstOrDefault()?.Id ?? 0;
+
+                                                    break;
+                                                }
+                                        }
+                                        Console.WriteLine("book added successfully");
+                                        managerBooks.AddNewBook(BookName, pages, year, costPrice, price, heir, AuthorId, genreId, PublisherId);
+
+
+
+
+
+
+                                        break;
+                                    }
+                                case 10:
+                                    {
+                                        Console.Clear();
+                                        Console.WriteLine("Enter book name for delete");
+                                        string name = Console.ReadLine();
+                                        managerBooks.DeleteBookByName(name);
+                                        break;
+                                    }
+                                default:
+                                    Console.Clear();
+                                    Console.WriteLine("Invalid choice. Please try again.");
+                                    break;
+                            }
+                        } while (b != 0);
+                    }
+                    else
+                    {
+                        attemptsLeft--;
+                        Console.WriteLine($"The password is incorrect. Remaining attempts : {attemptsLeft}");
+                    }
+                    if (attemptsLeft == 0)
+                    {
+                        Console.WriteLine("You have exhausted all attempts. The program will be closed.");
+                        Environment.Exit(0);
+                    }
+                }
             }
 
         }
